@@ -39,14 +39,17 @@
                         </td>
                         <td>
                             <button> <a type="button" href="/edit-crud?id=<%= dataTable[i].id %>">Edit</a></button>
-                            <button>Delete</button>
+                            <button> <a type="button" href="/delete-crud?id=<%= dataTable[i].id %>">Delete</a></button>
                         </td>
 
 
                     </tr>
                     <% } %>
+
             </tbody>
         </table>
+        <div style="margin-top: 50px ;text-align:center;"> <a style=" border: 1px solid;" href="/crud">Create New
+                User</a></div>
     </div>
 </body>
 

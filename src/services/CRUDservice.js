@@ -80,9 +80,7 @@ let updateUserData = (data) => {
                 user.lasttName = data.lastName
                 user.address = data.address
 
-                await user.save();
-                let allUser = await db.User.findAll();
-                resolve(allUser)
+                resolve(await user.save());
             }
             else {
                 resolve()
@@ -94,4 +92,22 @@ let updateUserData = (data) => {
     })
 }
 
-module.exports = { createNewUser, getAllUser, getUserInfoById, updateUserData }
+let deleteUserById = (userId) => {
+    new Promise(async (resolve, reject) => {
+        try {
+            if (userId) {
+                resolve(await db.User.destroy({
+                    where: { id: userId }
+                }))
+            }
+            else resolve();
+
+        } catch (e) {
+            reject(e)
+        }
+
+    })
+
+}
+
+module.exports = { createNewUser, getAllUser, getUserInfoById, updateUserData, deleteUserById }

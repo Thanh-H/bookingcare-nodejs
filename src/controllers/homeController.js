@@ -1,4 +1,5 @@
 
+import { json } from 'body-parser';
 import db from '../models/index'
 import CRUDservice from '../services/CRUDservice'
 let getHomePage = async (req, res) => {
@@ -40,10 +41,19 @@ let getEditCRUD = async (req, res) => {
 
 let putCRUD = async (req, res) => {
     let data = req.body;
-    let allUser = await CRUDservice.updateUserData(data);
-    return res.render('displayCRUD.ejs', {
-        dataTable: allUser
-    })
+    await CRUDservice.updateUserData(data);
+    return res.redirect('/get-crud')
 }
 
-module.exports = { getHomePage, getCRUD, postCRUD, displayGetCRUD, getEditCRUD, putCRUD } 
+let deleteCRUD = async (req, res) => {
+    let userId = req.query.id
+    if (userId) {
+        await CRUDservice.deleteUserById(userId);
+        return res.send('Delete user success')
+    }
+    else {
+        return res.send('User not found!')
+    }
+}
+
+module.exports = { getHomePage, getCRUD, postCRUD, displayGetCRUD, getEditCRUD, putCRUD, deleteCRUD } 
