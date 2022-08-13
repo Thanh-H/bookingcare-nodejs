@@ -12,7 +12,7 @@ let handleUserLogin = (email, password) => {
             if (isExist) {
                 let user = await db.User.findOne({
                     where: { email: email },
-                    attributes: ['email', 'roleId', 'password'],
+                    attributes: ['email', 'roleId', 'password', 'firstName', 'lastName'],
                     raw: true
                 })
                 if (user) {
@@ -102,7 +102,7 @@ let createNewUser = async (data) => {
             if (check === true) {
                 resolve({
                     errCode: 1,
-                    message: 'Your email is already in used, please try another email!'
+                    errMessage: 'Your email is already in used, please try another email!'
                 })
             }
             else {
@@ -116,10 +116,11 @@ let createNewUser = async (data) => {
                     phonenumber: data.phonenumber,
                     gender: data.gender,
                     roleId: data.roleId,
+                    positionId: data.positionId
                 })
                 resolve({
                     errCode: 0,
-                    message: 'ok'
+                    errMessage: 'ok'
                 })
             }
 
@@ -149,18 +150,21 @@ let updateUser = (data) => {
             if (!user) {
                 resolve({
                     errCode: 2,
-                    message: 'The users is not exist'
+                    errMessage: 'The users is not exist'
                 })
             }
             user.email = data.email
             user.firstName = data.firstName
             user.lastName = data.lastName
             user.address = data.address
+            user.phonenumber = data.phonenumber
+            user.gender = data.gender
+            user.roleId = data.roleId
             await user.save()
             console.log(">>>>>>>>>>", user)
             resolve({
                 errCode: 0,
-                message: 'update succeeds'
+                errMessage: 'update succeeds'
             })
         } catch (e) {
             reject(e)
@@ -178,7 +182,7 @@ let DeleteUser = (id) => {
             if (!foundUser) {
                 resolve({
                     errCode: 2,
-                    message: 'The users is not exist'
+                    errMessage: 'The users is not exist'
                 })
             }
             await db.User.destroy({
@@ -186,7 +190,7 @@ let DeleteUser = (id) => {
             })
             resolve({
                 errCode: 0,
-                message: 'delete succeeds'
+                errMessage: 'delete succeeds'
             })
 
 
@@ -197,11 +201,40 @@ let DeleteUser = (id) => {
     })
 }
 
+let GetAllCodes = (type) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            if (!type) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameters'
+                })
+            } else {
+                let data = await db.Allcode.findAll({
+                    where: { type: type }
+                })
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+
+
+        } catch (e) {
+            reject(e)
+        }
+
+
+
+    })
+}
 
 module.exports = {
     handleUserLogin,
     getAllUsers: getAllUsers,
     createNewUser,
     updateUser,
-    DeleteUser
+    DeleteUser,
+    GetAllCodes
 }

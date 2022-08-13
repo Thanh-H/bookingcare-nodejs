@@ -6,13 +6,13 @@ let handleLogin = async (req, res) => {
     if (!email || !password) {
         return res.status(500).json({
             errCode: 1,
-            message: 'missing input parameter!'
+            errMessage: 'missing input parameter!'
         })
     }
     let userData = await userService.handleUserLogin(email, password);
     return res.status(200).json({
         errCode: userData.errCode,
-        message: userData.errMessage,
+        errMessage: userData.errMessage,
         user: userData.user ? userData.user : {}
     })
 }
@@ -22,14 +22,14 @@ let handleGetAllUsers = async (req, res) => {
     if (!id) {
         return res.status(200).json({
             errCode: 1,
-            message: 'Missing required Parameters',
+            errMessage: 'Missing required Parameters',
             users: []
         })
     }
     let users = await userService.getAllUsers(id)
     return res.status(200).json({
         errCode: 0,
-        message: 'ok',
+        errMessage: 'ok',
         users
     })
 }
@@ -45,7 +45,7 @@ let handleEditUser = async (req, res) => {
     if (!id) {
         return res.status(200).json({
             errCode: 1,
-            message: 'missing required parameters'
+            errMessage: 'missing required parameters'
         })
     }
     let message = await userService.updateUser(data)
@@ -57,11 +57,27 @@ let handleDeleteUser = async (req, res) => {
     if (!id) {
         return res.status(200).json({
             errCode: 1,
-            message: 'missing required parameters'
+            errMessage: 'missing required parameters'
         })
     }
     let message = await userService.DeleteUser(id)
     return res.status(200).json(message)
+}
+
+let handleGetAllCodes = async (req, res) => {
+    try {
+        let data = await userService.GetAllCodes(req.query.type)
+        return res.status(200).json(data)
+
+    } catch (e) {
+        console.log('get all code error', e)
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: 'Error from sever'
+        })
+    }
+
+
 }
 
 module.exports = {
@@ -69,5 +85,6 @@ module.exports = {
     handleGetAllUsers,
     handleCreateNewUser,
     handleEditUser,
-    handleDeleteUser
+    handleDeleteUser,
+    handleGetAllCodes
 }
