@@ -116,7 +116,8 @@ let createNewUser = async (data) => {
                     phonenumber: data.phonenumber,
                     gender: data.gender,
                     roleId: data.roleId,
-                    positionId: data.positionId
+                    positionId: data.positionId,
+                    image: data.avatar
                 })
                 resolve({
                     errCode: 0,
@@ -153,15 +154,17 @@ let updateUser = (data) => {
                     errMessage: 'The users is not exist'
                 })
             }
-            user.email = data.email
             user.firstName = data.firstName
             user.lastName = data.lastName
             user.address = data.address
             user.phonenumber = data.phonenumber
             user.gender = data.gender
             user.roleId = data.roleId
+            user.positionId = data.positionId
+            if (data.avatar) {
+                user.image = data.avatar
+            }
             await user.save()
-            console.log(">>>>>>>>>>", user)
             resolve({
                 errCode: 0,
                 errMessage: 'update succeeds'
