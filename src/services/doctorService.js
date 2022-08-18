@@ -1,5 +1,9 @@
+import _ from 'lodash';
 import allcode from '../models/allcode'
 import db from '../models/index'
+require('dotenv').config();
+
+const MAX_NUMBER_SCHEDULE = process.env.MAX_NUMBER_SCHEDULE
 
 let getTopDoctorHomeService = (limitInput) => {
     return new Promise(async (resolve, reject) => {
@@ -51,23 +55,42 @@ let getAllDoctorService = () => {
 let postInforDoctorService = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown) {
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
                 })
             }
             else {
-                await db.Markdown.create({
-                    contentHTML: inputData.contentHTML,
-                    contentMarkdown: inputData.contentMarkdown,
-                    description: inputData.description,
-                    doctorId: inputData.doctorId
-                })
-                resolve({
-                    errCode: 0,
-                    errMessage: ' save infor doctor success'
-                })
+                if (inputData.action === 'CREATE') {
+                    await db.Markdown.create({
+                        contentHTML: inputData.contentHTML,
+                        contentMarkdown: inputData.contentMarkdown,
+                        description: inputData.description,
+                        doctorId: inputData.doctorId
+                    })
+                    resolve({
+                        errCode: 0,
+                        errMessage: ' save infor doctor success'
+                    })
+                }
+                if (inputData.action === 'EDIT') {
+                    let doctorMarkdown = await db.Markdown.findOne({
+                        where: { doctorId: inputData.doctorId },
+                        raw: false
+                    })
+                    if (doctorMarkdown) {
+                        doctorMarkdown.contentHTML = inputData.contentHTML
+                        doctorMarkdown.contentMarkdown = inputData.contentMarkdown
+                        doctorMarkdown.description = inputData.description
+                        await doctorMarkdown.save()
+                        resolve({
+                            errCode: 0,
+                            errMessage: ' Update infor doctor success'
+                        })
+                    }
+
+                }
             }
         } catch (error) {
 
@@ -115,9 +138,95 @@ let getDetailDoctorByIdService = (id) => {
         }
     })
 }
+
+let bulkCreateScheduleService = (data) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!data.arrSchedule && !data.formatedDate && !data.doctorId) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing require parameter'
+                })
+            } else {
+                let schedule = data.arrSchedule
+                if (schedule && schedule.length > 0) {
+                    schedule = schedule.map(item => {
+                        item.maxNumber = MAX_NUMBER_SCHEDULE
+                        return item
+                    })
+                }
+
+                //get all existing data
+                let existing = await db.Schedule.findAll({
+                    where: { doctorId: data.doctorId, date: data.formatedDate, },
+                    attributes: ['timeType', 'doctorId', 'date', 'maxNumber'],
+                    raw: true
+                })
+
+                //convert date
+                // if (existing && existing.length > 0) {
+                //     existing = existing.map(item => {
+                //         item.date = new Date(item.date).getTime()
+                //         return item
+                //     })
+                // }
+                console.log('db', existing)
+                console.log('reactjs', schedule)
+                //compare different
+                let toCreate = _.differenceWith(schedule, existing, (a, b) => {
+                    return a.timeType === b.timeType && a.date === b.date
+                })
+
+                //create data
+                if (toCreate && toCreate.length > 0) {
+                    await db.Schedule.bulkCreate(toCreate)
+                }
+                resolve({
+                    errCode: 0,
+                    errMessage: 'ok'
+                })
+            }
+        } catch (error) {
+            reject(error)
+
+        }
+    })
+}
+
+let getScheduleByDateService = (doctorId, date) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!doctorId || !date) {
+                resolve({
+                    errCode: 1,
+                    errMessage: "Missing required parameters"
+                })
+            }
+            else {
+                let data = await db.Schedule.findAll({
+                    where: { doctorId: doctorId, date: date }
+
+                })
+                if (data.length === 0) {
+                    data = []
+                }
+                console.log(data)
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+        } catch (error) {
+            reject(error)
+        }
+
+    })
+}
 module.exports = {
     getTopDoctorHomeService: getTopDoctorHomeService,
     getAllDoctorService: getAllDoctorService,
     postInforDoctorService: postInforDoctorService,
-    getDetailDoctorByIdService: getDetailDoctorByIdService
-}
+    getDetailDoctorByIdService: getDetailDoctorByIdService,
+    bulkCreateScheduleService: bulkCreateScheduleService,
+    getScheduleByDateService
+} 

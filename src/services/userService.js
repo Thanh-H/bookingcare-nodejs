@@ -181,6 +181,7 @@ let DeleteUser = (id) => {
 
             let foundUser = await db.User.findOne({
                 where: { id: id }
+
             })
             if (!foundUser) {
                 resolve({
