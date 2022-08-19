@@ -36,7 +36,7 @@ let postInforDocdor = async (req, res) => {
         return res.status(200).json(message)
 
     } catch (error) {
-        console(error)
+        console.log(error)
         return res.status(200).json({
             errCode: -1,
             errMessage: "error from server"

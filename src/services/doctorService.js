@@ -52,10 +52,15 @@ let getAllDoctorService = () => {
         }
     })
 }
+
+
+
 let postInforDoctorService = (inputData) => {
     return new Promise(async (resolve, reject) => {
         try {
-            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action) {
+            if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action
+                || !inputData.selectedPrice || !inputData.selectedProvince || !inputData.selectedPayment
+                || !inputData.addressClinic || !inputData.nameClinic || !inputData.note) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
@@ -69,12 +74,8 @@ let postInforDoctorService = (inputData) => {
                         description: inputData.description,
                         doctorId: inputData.doctorId
                     })
-                    resolve({
-                        errCode: 0,
-                        errMessage: ' save infor doctor success'
-                    })
-                }
-                if (inputData.action === 'EDIT') {
+
+                } else if (inputData.action === 'EDIT') {
                     let doctorMarkdown = await db.Markdown.findOne({
                         where: { doctorId: inputData.doctorId },
                         raw: false
@@ -84,15 +85,48 @@ let postInforDoctorService = (inputData) => {
                         doctorMarkdown.contentMarkdown = inputData.contentMarkdown
                         doctorMarkdown.description = inputData.description
                         await doctorMarkdown.save()
-                        resolve({
-                            errCode: 0,
-                            errMessage: ' Update infor doctor success'
-                        })
+
                     }
 
                 }
+
+                let doctorInfor = await db.Doctor_infor.findOne({
+                    where: { doctorId: inputData.doctorId },
+                    raw: false
+                })
+
+                if (!doctorInfor) {
+                    //Create
+                    await db.Doctor_infor.create({
+                        doctorId: inputData.doctorId,
+                        priceId: inputData.selectedPrice,
+                        provinceId: inputData.selectedProvince,
+                        paymentId: inputData.selectedPayment,
+                        addressClinic: inputData.addressClinic,
+                        nameClinic: inputData.nameClinic,
+                        note: inputData.note,
+                    })
+                }
+                else {
+                    //Update
+                    doctorInfor.doctorId = inputData.doctorId
+                    doctorInfor.priceId = inputData.selectedPrice
+                    doctorInfor.provinceId = inputData.selectedProvince
+                    doctorInfor.paymentId = inputData.selectedPayment
+                    doctorInfor.addressClinic = inputData.addressClinic
+                    doctorInfor.nameClinic = inputData.nameClinic
+                    doctorInfor.note = inputData.note
+                    await doctorInfor.save()
+
+                }
+                resolve({
+                    errCode: 0,
+                    errMessage: ' save infor doctor success'
+                })
             }
+
         } catch (error) {
+            reject(error)
 
         }
     })
@@ -204,13 +238,18 @@ let getScheduleByDateService = (doctorId, date) => {
             }
             else {
                 let data = await db.Schedule.findAll({
-                    where: { doctorId: doctorId, date: date }
+                    where: { doctorId: doctorId, date: date },
+                    include: [
+                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] }
+                    ],
+
+                    raw: true,
+                    nest: true
 
                 })
                 if (data.length === 0) {
                     data = []
                 }
-                console.log(data)
                 resolve({
                     errCode: 0,
                     data: data
