@@ -148,10 +148,23 @@ let getDetailDoctorByIdService = (id) => {
                     },
                     include: [
                         { model: db.Markdown, attributes: ['description', 'contentMarkdown', 'contentHTML'] },
-                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] }
+                        { model: db.Allcode, as: 'positionData', attributes: ['valueEn', 'valueVi'] },
+                        {
+                            model: db.Doctor_infor, attributes: {
+                                exclude: ['id', 'createAt', 'updateAt', 'doctorId']
+                            },
+                            include: [
+                                { model: db.Allcode, as: 'priceData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'paymentData', attributes: ['valueEn', 'valueVi'] },
+                                { model: db.Allcode, as: 'provinceData', attributes: ['valueEn', 'valueVi'] },
+                            ]
+
+
+                        },
+
                     ],
 
-                    raw: true,
+                    raw: false,
                     nest: true
                 })
                 if (data && data.image) {
@@ -197,16 +210,7 @@ let bulkCreateScheduleService = (data) => {
                     raw: true
                 })
 
-                //convert date
-                // if (existing && existing.length > 0) {
-                //     existing = existing.map(item => {
-                //         item.date = new Date(item.date).getTime()
-                //         return item
-                //     })
-                // }
-                console.log('db', existing)
-                console.log('reactjs', schedule)
-                //compare different
+
                 let toCreate = _.differenceWith(schedule, existing, (a, b) => {
                     return a.timeType === b.timeType && a.date === b.date
                 })
@@ -261,11 +265,53 @@ let getScheduleByDateService = (doctorId, date) => {
 
     })
 }
+
+let getExtraInforDoctorByIdService = (id) => {
+    return new Promise(async (resolve, reject) => {
+        try {
+            if (!id) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing required parameter'
+                })
+            }
+            else {
+                let data = await db.Doctor_infor.findOne({
+                    where: { doctorId: id },
+                    attributes: {
+                        exclude: ['id', 'doctorId']
+                    },
+                    include: [
+                        { model: db.Allcode, as: 'priceData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'paymentData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.Allcode, as: 'provinceData', attributes: ['valueEn', 'valueVi'] },
+
+                    ],
+
+                    raw: false,
+                    nest: true
+                })
+                if (!data) {
+                    data = {}
+                }
+                resolve({
+                    errCode: 0,
+                    data: data
+                })
+            }
+
+
+        } catch (e) {
+            reject(e)
+        }
+    })
+}
 module.exports = {
     getTopDoctorHomeService: getTopDoctorHomeService,
     getAllDoctorService: getAllDoctorService,
     postInforDoctorService: postInforDoctorService,
     getDetailDoctorByIdService: getDetailDoctorByIdService,
     bulkCreateScheduleService: bulkCreateScheduleService,
-    getScheduleByDateService
+    getScheduleByDateService: getScheduleByDateService,
+    getExtraInforDoctorByIdService: getExtraInforDoctorByIdService
 } 
