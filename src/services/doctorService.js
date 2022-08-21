@@ -1,5 +1,4 @@
 import _ from 'lodash';
-import allcode from '../models/allcode'
 import db from '../models/index'
 require('dotenv').config();
 
@@ -244,7 +243,8 @@ let getScheduleByDateService = (doctorId, date) => {
                 let data = await db.Schedule.findAll({
                     where: { doctorId: doctorId, date: date },
                     include: [
-                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] }
+                        { model: db.Allcode, as: 'timeTypeData', attributes: ['valueEn', 'valueVi'] },
+                        { model: db.User, as: 'doctorData', attributes: ['firstName', 'lastName'] }
                     ],
 
                     raw: true,
