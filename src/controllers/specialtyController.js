@@ -1,8 +1,9 @@
-import patientService from '../services/patientService'
+import specialtyService from '../services/specialtyService'
 
-let postBookAppointment = async (req, res) => {
+
+let createSpecialty = async (req, res) => {
     try {
-        let message = await patientService.postBookAppointmentService(req.body)
+        let message = await specialtyService.createSpecialtyService(req.body)
         return res.status(200).json(message)
 
     } catch (error) {
@@ -12,8 +13,8 @@ let postBookAppointment = async (req, res) => {
             errMessage: "error from server"
         })
     }
-
 }
+
 module.exports = {
-    postBookAppointment
+    createSpecialty
 }
