@@ -38,6 +38,7 @@ let initwebRoutes = (app) => {
 
     router.post('/api/create-new-specialTy', specialtyController.createSpecialty)
     router.get('/api/get-specialty', specialtyController.getSpecialty)
+    router.get('/api/get-detail-specialty-by-id', specialtyController.getDetailSpecialById)
 
 
     return app.use('/', router)
