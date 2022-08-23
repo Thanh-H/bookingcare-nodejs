@@ -15,6 +15,20 @@ let createSpecialty = async (req, res) => {
     }
 }
 
+let getSpecialty = async (req, res) => {
+    try {
+        let message = await specialtyService.getSpecialtyService()
+        return res.status(200).json(message)
+
+    } catch (error) {
+        console.log(error)
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "error from server"
+        })
+    }
+}
+
 module.exports = {
-    createSpecialty
+    createSpecialty, getSpecialty
 }

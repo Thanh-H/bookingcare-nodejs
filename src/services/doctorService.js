@@ -59,7 +59,7 @@ let postInforDoctorService = (inputData) => {
         try {
             if (!inputData.doctorId || !inputData.contentHTML || !inputData.contentMarkdown || !inputData.action
                 || !inputData.selectedPrice || !inputData.selectedProvince || !inputData.selectedPayment
-                || !inputData.addressClinic || !inputData.nameClinic || !inputData.note) {
+                || !inputData.addressClinic || !inputData.nameClinic || !inputData.note || !inputData.selectedSpecialty) {
                 resolve({
                     errCode: 1,
                     errMessage: 'Missing parameter'
@@ -104,6 +104,7 @@ let postInforDoctorService = (inputData) => {
                         addressClinic: inputData.addressClinic,
                         nameClinic: inputData.nameClinic,
                         note: inputData.note,
+                        specialtyId: inputData.selectedSpecialty
                     })
                 }
                 else {
@@ -115,6 +116,7 @@ let postInforDoctorService = (inputData) => {
                     doctorInfor.addressClinic = inputData.addressClinic
                     doctorInfor.nameClinic = inputData.nameClinic
                     doctorInfor.note = inputData.note
+                    doctorInfor.specialtyId = inputData.selectedSpecialty
                     await doctorInfor.save()
 
                 }
