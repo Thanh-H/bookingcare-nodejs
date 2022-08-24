@@ -8,17 +8,17 @@ module.exports = {
                 primaryKey: true,
                 type: Sequelize.INTEGER
             },
-            address: {
-                type: Sequelize.STRING
+            image: {
+                type: Sequelize.BLOB('long')
             },
             name: {
                 type: Sequelize.STRING
             },
-            desciption: {
+            descriptionMarkdown: {
                 type: Sequelize.TEXT
             },
-            image: {
-                type: Sequelize.STRING
+            descriptionHTML: {
+                type: Sequelize.TEXT
             },
             createdAt: {
                 allowNull: false,

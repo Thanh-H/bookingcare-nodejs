@@ -364,6 +364,62 @@ let getProfileDoctorByIdService = (id) => {
         }
     })
 }
+
+let getNameSpecialtyByDoctorIdService = (id) => {
+
+    return new Promise(async (resolve, reject) => {
+
+        try {
+            if (!id) {
+                resolve({
+                    errCode: 1,
+                    errMessage: 'Missing Parameter'
+                })
+
+            } else {
+                if (id = "ALL") {
+                    let data = await db.Doctor_infor.findAll({
+                        // where: { doctorId: id },
+                        attributes: ['doctorId', 'specialtyId'],
+                        include: [
+                            { model: db.Specialty, as: 'specialtyData', attributes: ['name'] },
+                        ],
+                        raw: true,
+                        nest: true
+
+                    })
+                    resolve({
+                        errCode: 0,
+                        errMessage: 'ok',
+                        data: data
+                    })
+
+                }
+                else {
+                    let data = await db.Doctor_infor.findAll({
+                        where: { doctorId: id },
+                        attributes: ['doctorId', 'specialtyId'],
+                        include: [
+                            { model: db.Specialty, as: 'specialtyData', attributes: ['name'] },
+                        ],
+                        raw: true,
+                        nest: true
+
+                    })
+                    resolve({
+                        errCode: 0,
+                        errMessage: 'ok',
+                        data: data
+                    })
+                }
+
+
+            }
+        } catch (error) {
+            reject(error)
+        }
+    })
+}
 module.exports = {
     getTopDoctorHomeService: getTopDoctorHomeService,
     getAllDoctorService: getAllDoctorService,
@@ -372,5 +428,6 @@ module.exports = {
     bulkCreateScheduleService: bulkCreateScheduleService,
     getScheduleByDateService: getScheduleByDateService,
     getExtraInforDoctorByIdService: getExtraInforDoctorByIdService,
-    getProfileDoctorByIdService: getProfileDoctorByIdService
+    getProfileDoctorByIdService: getProfileDoctorByIdService,
+    getNameSpecialtyByDoctorIdService
 } 

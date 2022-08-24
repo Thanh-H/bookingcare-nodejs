@@ -1,7 +1,7 @@
 import db from "../models";
 
 
-let createSpecialtyService = (data) => {
+let createClinicService = (data) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (!data.name || !data.imageBase64 || !data.descriptionHTML
@@ -13,7 +13,7 @@ let createSpecialtyService = (data) => {
 
             }
             else {
-                await db.Specialty.create({
+                await db.Clinic.create({
                     name: data.name,
                     image: data.imageBase64,
                     descriptionHTML: data.descriptionHTML,
@@ -30,14 +30,14 @@ let createSpecialtyService = (data) => {
     })
 }
 
-let getSpecialtyService = () => {
+let getClinicService = () => {
     return new Promise(async (resolve, reject) => {
         try {
-            let data = await db.Specialty.findAll()
+            let data = await db.Clinic.findAll()
             if (!data) {
                 resolve({
                     errCode: 1,
-                    errMessage: 'Specialty not found'
+                    errMessage: 'Clinic not found'
                 })
             }
             else {
@@ -59,7 +59,7 @@ let getSpecialtyService = () => {
     })
 }
 
-let getDetailSpecialByIdSevice = (id, location) => {
+let getDetailClinicByIdSevice = (id, location) => {
     return new Promise(async (resolve, reject) => {
         try {
             if (!id || !location) {
@@ -68,28 +68,28 @@ let getDetailSpecialByIdSevice = (id, location) => {
                     errMessage: 'Missing parameter'
                 })
             } else {
-                let data = await db.Specialty.findOne({
+                let data = await db.Clinic.findOne({
                     where: { id: id },
                     attributes: ['descriptionHTML', 'descriptionMarkdown']
                 })
                 if (data) {
-                    let doctorSpecialty = []
+                    let doctorClinic = []
                     if (location === 'ALL') {
 
-                        doctorSpecialty = await db.Doctor_infor.findAll({
-                            where: { specialtyId: id },
+                        doctorClinic = await db.Doctor_infor.findAll({
+                            where: { ClinicId: id },
                             attributes: ['doctorId', 'provinceId']
                         })
                     } else {
-                        doctorSpecialty = await db.Doctor_infor.findAll({
+                        doctorClinic = await db.Doctor_infor.findAll({
                             where: {
-                                specialtyId: id,
+                                ClinicId: id,
                                 provinceId: location
                             },
                             attributes: ['doctorId', 'provinceId']
                         })
                     }
-                    data.doctorSpecialty = doctorSpecialty
+                    data.doctorClinic = doctorClinic
                 } else {
                     data = {}
                 }
@@ -106,5 +106,5 @@ let getDetailSpecialByIdSevice = (id, location) => {
 }
 
 module.exports = {
-    createSpecialtyService, getSpecialtyService, getDetailSpecialByIdSevice
+    createClinicService, getClinicService, getDetailClinicByIdSevice
 }
