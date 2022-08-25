@@ -103,6 +103,27 @@ let postVerifyBookAppointmentService = (data) => {
     })
 }
 
+let autoDeleteBookingService = () => {
+    return new Promise(async (resolve, reject) => {
+        try {
+
+            await db.Booking.destroy({
+                where: {},
+                truncate: true
+            })
+            resolve({
+                errCode: 0,
+                errMessage: 'delete succeeds'
+            })
+
+
+        } catch (e) {
+            reject(e)
+
+        }
+    })
+}
+
 module.exports = {
-    postBookAppointmentService, postVerifyBookAppointmentService
+    postBookAppointmentService, postVerifyBookAppointmentService, autoDeleteBookingService
 }

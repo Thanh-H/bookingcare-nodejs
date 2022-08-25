@@ -48,6 +48,8 @@ let initwebRoutes = (app) => {
     router.get('/api/get-clinic', clinicController.getClinic)
     router.get('/api/get-detail-clinic-by-id', clinicController.getDetailClinicById)
 
+    router.delete('/api/auto-delete-booking', patientController.autoDeleteBooking)
+
     return app.use('/', router)
 }
 

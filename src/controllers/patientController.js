@@ -28,7 +28,20 @@ let postVerifyBookAppointment = async (req, res) => {
         })
     }
 }
+let autoDeleteBooking = async (req, res) => {
+    try {
+        let message = await patientService.autoDeleteBookingService()
+        return res.status(200).json(message)
+
+    } catch (error) {
+        console.log(error)
+        return res.status(200).json({
+            errCode: -1,
+            errMessage: "error from server"
+        })
+    }
+}
 
 module.exports = {
-    postBookAppointment, postVerifyBookAppointment
+    postBookAppointment, postVerifyBookAppointment, autoDeleteBooking
 }

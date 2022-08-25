@@ -43,7 +43,7 @@ let getSpecialtyService = () => {
             else {
                 if (data && data.length > 0) {
                     data.map(item => {
-                        item.imageBase64 = new Buffer(item.image, 'base64').toString('binary')
+                        item.imageBase64 = Buffer.from(item.image, 'base64').toString('binary')
                         return item
                     })
                     resolve({
